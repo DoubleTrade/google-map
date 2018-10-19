@@ -29,5 +29,16 @@
     "@polymer/polymer": "^3.0.5",
     "@polymer/iron-resizable-behavior": "^3.0.0",
     "@polymer/iron-selector": "^3.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cwenzelg/google-map.git"
+  },
+  "author": "Christian Wenzel",
+  "bugs": {
+    "url": "https://github.com/cwenzelg/google-map/issues"
   }
 }
