@@ -62,7 +62,7 @@ If you're seeing the message "You have included the Google Maps API multiple tim
 import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
 import { html } from '@polymer/polymer/lib/utils/html-tag.js';
 import { IronResizableBehavior } from '@polymer/iron-resizable-behavior/iron-resizable-behavior.js';
-import { dom} from '@polymer/polymer/lib/legacy/polymer.dom.js';
+import { dom } from '@polymer/polymer/lib/legacy/polymer.dom.js';
 import '@vowo/google-apis/google-maps-api.js';
 import '@polymer/iron-selector/iron-selector.js';
 import '@polymer/iron-resizable-behavior/iron-resizable-behavior.js';
@@ -325,7 +325,7 @@ Polymer({
      */
     styles: {
       type: Object,
-      value: function() { return {}; }
+      value: function () { return {}; }
     },
 
     /**
@@ -404,7 +404,7 @@ Polymer({
      */
     additionalMapOptions: {
       type: Object,
-      value: function() { return {}; }
+      value: function () { return {}; }
     },
 
     /**
@@ -412,7 +412,7 @@ Polymer({
      */
     markers: {
       type: Array,
-      value: function() { return []; },
+      value: function () { return []; },
       readOnly: true
     },
 
@@ -421,7 +421,7 @@ Polymer({
      */
     objects: {
       type: Array,
-      value: function() { return []; },
+      value: function () { return []; },
       readOnly: true
     },
 
@@ -446,11 +446,12 @@ Polymer({
     '_debounceUpdateCenter(latitude, longitude)'
   ],
 
-  attached: function() {
+  attached: function () {
+    this._observeHeadMutation();
     this._initGMap();
   },
 
-  detached: function() {
+  detached: function () {
     if (this._markersChildrenListener) {
       this.unlisten(this.$.selector, 'items-changed', '_updateMarkers');
       this._markersChildrenListener = null;
@@ -461,7 +462,7 @@ Polymer({
     }
   },
 
-  _initGMap: function() {
+  _initGMap: function () {
     if (this.map) {
       return; // already initialized
     }
@@ -482,11 +483,11 @@ Polymer({
     this.fire('google-map-ready');
   },
 
-  _mapApiLoaded: function() {
+  _mapApiLoaded: function () {
     this._initGMap();
   },
 
-  _getMapOptions: function() {
+  _getMapOptions: function () {
     var mapOptions = {
       zoom: this.zoom,
       tilt: this.noAutoTilt ? 0 : 45,
@@ -512,7 +513,7 @@ Polymer({
     return mapOptions;
   },
 
-  _attachChildrenToMap: function(children) {
+  _attachChildrenToMap: function (children) {
     if (this.map) {
       for (var i = 0, child; child = children[i]; ++i) {
         child.map = this.map;
@@ -521,7 +522,7 @@ Polymer({
   },
 
   // watch for future updates to marker objects
-  _observeMarkers: function() {
+  _observeMarkers: function () {
     // Watch for future updates.
     if (this._markersChildrenListener) {
       return;
@@ -529,13 +530,13 @@ Polymer({
     this._markersChildrenListener = this.listen(this.$.selector, 'items-changed', '_updateMarkers');
   },
 
-  _updateMarkers: function() {
+  _updateMarkers: function () {
     var newMarkers = Array.prototype.slice.call(
-        dom(this.$.markers).getDistributedNodes());
+      dom(this.$.markers).getDistributedNodes());
 
     // do not recompute if markers have not been added or removed
     if (newMarkers.length === this.markers.length) {
-      var added = newMarkers.filter(function(m) {
+      var added = newMarkers.filter(function (m) {
         return this.markers && this.markers.indexOf(m) === -1;
       }.bind(this));
       if (added.length === 0) {
@@ -559,7 +560,7 @@ Polymer({
   },
 
   // watch for future updates to non-marker objects
-  _observeObjects: function() {
+  _observeObjects: function () {
     if (this._objectsMutationObserver) {
       return;
     }
@@ -569,13 +570,13 @@ Polymer({
     });
   },
 
-  _updateObjects: function() {
+  _updateObjects: function () {
     var newObjects = Array.prototype.slice.call(
-        dom(this.$.objects).getDistributedNodes());
+      dom(this.$.objects).getDistributedNodes());
 
     // Do not recompute if objects have not been added or removed.
     if (newObjects.length === this.objects.length) {
-      var added = newObjects.filter(function(o) {
+      var added = newObjects.filter(function (o) {
         return this.objects.indexOf(o) === -1;
       }.bind(this));
       if (added.length === 0) {
@@ -595,7 +596,7 @@ Polymer({
    *
    * @method clear
    */
-  clear: function() {
+  clear: function () {
     for (var i = 0, m; m = this.markers[i]; ++i) {
       m.marker.setMap(null);
     }
@@ -607,7 +608,7 @@ Polymer({
    *
    * @method resize
    */
-  resize: function() {
+  resize: function () {
     if (this.map) {
 
       // saves and restores latitude/longitude because resize can move the center
@@ -623,7 +624,7 @@ Polymer({
     }
   },
 
-  _loadKml: function() {
+  _loadKml: function () {
     if (this.map && this.kml) {
       var kmlfile = new google.maps.KmlLayer({
         url: this.kml,
@@ -632,11 +633,11 @@ Polymer({
     }
   },
 
-  _debounceUpdateCenter: function() {
+  _debounceUpdateCenter: function () {
     this.debounce('updateCenter', this._updateCenter);
   },
 
-  _updateCenter: function() {
+  _updateCenter: function () {
     this.cancelDebouncer('updateCenter');
 
     if (this.map && this.latitude !== undefined && this.longitude !== undefined) {
@@ -668,13 +669,13 @@ Polymer({
     }
   },
 
-  _zoomChanged: function() {
+  _zoomChanged: function () {
     if (this.map) {
       this.map.setZoom(Number(this.zoom));
     }
   },
 
-  _idleEvent: function() {
+  _idleEvent: function () {
     if (this.map) {
       this._forwardEvent('idle');
     } else {
@@ -682,7 +683,7 @@ Polymer({
     }
   },
 
-  _clickEventsChanged: function() {
+  _clickEventsChanged: function () {
     if (this.map) {
       if (this.clickEvents) {
         this._forwardEvent('click');
@@ -696,7 +697,7 @@ Polymer({
     }
   },
 
-  _dragEventsChanged: function() {
+  _dragEventsChanged: function () {
     if (this.map) {
       if (this.dragEvents) {
         this._forwardEvent('drag');
@@ -710,7 +711,7 @@ Polymer({
     }
   },
 
-  _mouseEventsChanged: function() {
+  _mouseEventsChanged: function () {
     if (this.map) {
       if (this.mouseEvents) {
         this._forwardEvent('mousemove');
@@ -724,46 +725,46 @@ Polymer({
     }
   },
 
-  _maxZoomChanged: function() {
+  _maxZoomChanged: function () {
     if (this.map) {
-      this.map.setOptions({maxZoom: Number(this.maxZoom)});
+      this.map.setOptions({ maxZoom: Number(this.maxZoom) });
     }
   },
 
-  _minZoomChanged: function() {
+  _minZoomChanged: function () {
     if (this.map) {
-      this.map.setOptions({minZoom: Number(this.minZoom)});
+      this.map.setOptions({ minZoom: Number(this.minZoom) });
     }
   },
 
-  _mapTypeChanged: function() {
+  _mapTypeChanged: function () {
     if (this.map) {
       this.map.setMapTypeId(this.mapType);
     }
   },
 
-  _disableDefaultUiChanged: function() {
+  _disableDefaultUiChanged: function () {
     if (!this.map) {
       return;
     }
-    this.map.setOptions({disableDefaultUI: this.disableDefaultUi});
+    this.map.setOptions({ disableDefaultUI: this.disableDefaultUi });
   },
 
-  _disableMapTypeControlChanged: function() {
+  _disableMapTypeControlChanged: function () {
     if (!this.map) {
       return;
     }
-    this.map.setOptions({mapTypeControl: !this.disableMapTypeControl});
+    this.map.setOptions({ mapTypeControl: !this.disableMapTypeControl });
   },
 
-  _disableStreetViewControlChanged: function() {
+  _disableStreetViewControlChanged: function () {
     if (!this.map) {
       return;
     }
-    this.map.setOptions({streetViewControl: !this.disableStreetViewControl});
+    this.map.setOptions({ streetViewControl: !this.disableStreetViewControl });
   },
 
-  _disableZoomChanged: function() {
+  _disableZoomChanged: function () {
     if (!this.map) {
       return;
     }
@@ -773,26 +774,26 @@ Polymer({
     });
   },
 
-  attributeChanged: function(attrName) {
+  attributeChanged: function (attrName) {
     if (!this.map) {
       return;
     }
     // Cannot use *Changed watchers for native properties.
     switch (attrName) {
       case 'draggable':
-        this.map.setOptions({draggable: this.draggable});
+        this.map.setOptions({ draggable: this.draggable });
         break;
     }
   },
 
-  _fitToMarkersChanged: function() {
+  _fitToMarkersChanged: function () {
     // TODO(ericbidelman): respect user's zoom level.
 
     if (this.map && this.fitToMarkers && this.markers.length > 0) {
       var latLngBounds = new google.maps.LatLngBounds();
       for (var i = 0, m; m = this.markers[i]; ++i) {
         latLngBounds.extend(
-            new google.maps.LatLng(m.latitude, m.longitude));
+          new google.maps.LatLng(m.latitude, m.longitude));
       }
 
       // For one marker, don't alter zoom, just center it.
@@ -804,18 +805,18 @@ Polymer({
     }
   },
 
-  _addMapListeners: function() {
-    google.maps.event.addListener(this.map, 'center_changed', function() {
+  _addMapListeners: function () {
+    google.maps.event.addListener(this.map, 'center_changed', function () {
       var center = this.map.getCenter();
       this.latitude = center.lat();
       this.longitude = center.lng();
     }.bind(this));
 
-    google.maps.event.addListener(this.map, 'zoom_changed', function() {
+    google.maps.event.addListener(this.map, 'zoom_changed', function () {
       this.zoom = this.map.getZoom();
     }.bind(this));
 
-    google.maps.event.addListener(this.map, 'maptypeid_changed', function() {
+    google.maps.event.addListener(this.map, 'maptypeid_changed', function () {
       this.mapType = this.map.getMapTypeId();
     }.bind(this));
 
@@ -825,20 +826,20 @@ Polymer({
     this._idleEvent();
   },
 
-  _clearListener: function(name) {
+  _clearListener: function (name) {
     if (this._listeners[name]) {
       google.maps.event.removeListener(this._listeners[name]);
       this._listeners[name] = null;
     }
   },
 
-  _forwardEvent: function(name) {
-    this._listeners[name] = google.maps.event.addListener(this.map, name, function(event) {
+  _forwardEvent: function (name) {
+    this._listeners[name] = google.maps.event.addListener(this.map, name, function (event) {
       this.fire('google-map-' + name, event);
     }.bind(this));
   },
 
-  _deselectMarker: function(e, detail) {
+  _deselectMarker: function (e, detail) {
     // If singleInfoWindow is set, update iron-selector's selected attribute to be null.
     // Else remove the marker from iron-selector's selected array.
     var markerIndex = this.$.selector.indexOf(e.target);
@@ -846,7 +847,23 @@ Polymer({
     if (this.singleInfoWindow) {
       this.$.selector.selected = null;
     } else if (this.$.selector.selectedValues) {
-      this.$.selector.selectedValues = this.$.selector.selectedValues.filter(function(i) {return i !== markerIndex});
+      this.$.selector.selectedValues = this.$.selector.selectedValues.filter(function (i) { return i !== markerIndex });
     }
+  },
+
+  _observeHeadMutation: function () {
+    const observer = new MutationObserver((mutationsList) => {
+      for (const mutation of mutationsList) {
+        for (const node of mutation.addedNodes) {
+          if (node.nodeName === 'STYLE' && node.textContent.indexOf('gm-') !== -1) {
+            this._copyToShadowRoot(node);
+          }
+        }
+      }
+    });
+    observer.observe(document.head, { childList: true });
+  },
+  _copyToShadowRoot: function (node) {
+    this.shadowRoot.appendChild(node.cloneNode(true));
   }
 });
