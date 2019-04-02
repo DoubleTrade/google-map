@@ -35,7 +35,7 @@ child of `google-map`.
 function setupDragHandler_() {
   if (this.draggable) {
     this.dragHandler_ = google.maps.event.addListener(
-        this.marker, 'dragend', onDragEnd_.bind(this));
+      this.marker, 'dragend', onDragEnd_.bind(this));
   } else {
     google.maps.event.removeListener(this.dragHandler_);
     this.dragHandler_ = null;
@@ -281,7 +281,7 @@ Polymer({
     '_updatePosition(latitude, longitude)'
   ],
 
-  detached: function() {
+  detached: function () {
     if (this.marker) {
       google.maps.event.clearInstanceListeners(this.marker);
       this._listeners = {};
@@ -291,21 +291,21 @@ Polymer({
       this._contentObserver.disconnect();
   },
 
-  attached: function() {
+  attached: function () {
     // If element is added back to DOM, put it back on the map.
     if (this.marker) {
       this.marker.setMap(this.map);
     }
   },
 
-  _updatePosition: function() {
+  _updatePosition: function () {
     if (this.marker && this.latitude != null && this.longitude != null) {
       this.marker.setPosition(new google.maps.LatLng(
         parseFloat(this.latitude), parseFloat(this.longitude)));
     }
   },
 
-  _clickEventsChanged: function() {
+  _clickEventsChanged: function () {
     if (this.map) {
       if (this.clickEvents) {
         this._forwardEvent('click');
@@ -319,7 +319,7 @@ Polymer({
     }
   },
 
-  _dragEventsChanged: function() {
+  _dragEventsChanged: function () {
     if (this.map) {
       if (this.dragEvents) {
         this._forwardEvent('drag');
@@ -333,7 +333,7 @@ Polymer({
     }
   },
 
-  _mouseEventsChanged: function() {
+  _mouseEventsChanged: function () {
     if (this.map) {
       if (this.mouseEvents) {
         this._forwardEvent('mousedown');
@@ -351,31 +351,31 @@ Polymer({
     }
   },
 
-  _animationChanged: function() {
+  _animationChanged: function () {
     if (this.marker) {
       this.marker.setAnimation(google.maps.Animation[this.animation]);
     }
   },
 
-  _labelChanged: function() {
+  _labelChanged: function () {
     if (this.marker) {
       this.marker.setLabel(this.label);
     }
   },
 
-  _iconChanged: function() {
+  _iconChanged: function () {
     if (this.marker) {
       this.marker.setIcon(this.icon);
     }
   },
 
-  _zIndexChanged: function() {
+  _zIndexChanged: function () {
     if (this.marker) {
       this.marker.setZIndex(this.zIndex);
     }
   },
 
-  _mapChanged: function() {
+  _mapChanged: function () {
     // Marker will be rebuilt, so disconnect existing one from old map and listeners.
     if (this.marker) {
       this.marker.setMap(null);
@@ -387,32 +387,38 @@ Polymer({
     }
   },
 
-  _contentChanged: function() {
+  _contentChanged: function () {
+    /* 
     if (this._contentObserver)
       this._contentObserver.disconnect();
     // Watch for future updates.
-    this._contentObserver = new MutationObserver( this._contentChanged.bind(this));
-    this._contentObserver.observe( this, {
+    this._contentObserver = new MutationObserver(this._contentChanged.bind(this));
+    this._contentObserver.observe(this, {
       childList: true,
       subtree: true
     });
+    **/
+    const infoWindowContentEl = document.createElement('div');
+    Array.from(this.children).forEach((child) => {
+      const node = child;
+      infoWindowContentEl.appendChild(node);
+    });
 
-    var content = this.innerHTML.trim();
-    if (content) {
+    if (infoWindowContentEl) {
       if (!this.info) {
         // Create a new infowindow
         this.info = new google.maps.InfoWindow();
-        this.openInfoHandler_ = google.maps.event.addListener(this.marker, 'click', function() {
+        this.openInfoHandler_ = google.maps.event.addListener(this.marker, 'click', function () {
           this.open = true;
         }.bind(this));
 
-        this.closeInfoHandler_ = google.maps.event.addListener(this.info, 'closeclick', function() {
+        this.closeInfoHandler_ = google.maps.event.addListener(this.info, 'closeclick', function () {
           this.open = false;
         }.bind(this));
       }
-      this.info.setContent(content);
+      this.info.setContent(infoWindowContentEl);
     } else {
-      if (this.info) {
+      if (this.info && !this.open) {
         // Destroy the existing infowindow.  It doesn't make sense to have an empty one.
         google.maps.event.removeListener(this.openInfoHandler_);
         google.maps.event.removeListener(this.closeInfoHandler_);
@@ -421,19 +427,20 @@ Polymer({
     }
   },
 
-  _openChanged: function() {
+  _openChanged: function () {
     if (this.info) {
       if (this.open) {
         this.info.open(this.map, this.marker);
         this.fire('google-map-marker-open');
       } else {
+        this.content = this.info.getContent();
         this.info.close();
         this.fire('google-map-marker-close');
       }
     }
   },
 
-  _mapReady: function() {
+  _mapReady: function () {
     this._listeners = {};
     this.marker = new google.maps.Marker({
       map: this.map,
@@ -457,20 +464,20 @@ Polymer({
     setupDragHandler_.bind(this)();
   },
 
-  _clearListener: function(name) {
+  _clearListener: function (name) {
     if (this._listeners[name]) {
       google.maps.event.removeListener(this._listeners[name]);
       this._listeners[name] = null;
     }
   },
 
-  _forwardEvent: function(name) {
-    this._listeners[name] = google.maps.event.addListener(this.marker, name, function(event) {
+  _forwardEvent: function (name) {
+    this._listeners[name] = google.maps.event.addListener(this.marker, name, function (event) {
       this.fire('google-map-marker-' + name, event);
     }.bind(this));
   },
 
-  attributeChanged: function(attrName) {
+  attributeChanged: function (attrName) {
     if (!this.marker) {
       return;
     }
