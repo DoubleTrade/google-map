@@ -1,7 +1,7 @@
 {
   "name": "@doubletrade/google-map",
   "description": "Google Maps web components built with Lit",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "module",
   "main": "libs/index.js",
   "keywords": [
