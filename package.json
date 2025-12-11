@@ -40,11 +40,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bodhiz/google-map.git"
+    "url": "git+https://github.com/doubletrade/google-map.git"
   },
-  "author": "Jonathan Adeline",
+  "author": "Julien Rousseau",
   "bugs": {
-    "url": "https://github.com/bodhiz/google-map/issues"
+    "url": "https://github.com/doubletrade/google-map/issues"
   },
   "exports": {
     ".": "./libs/index.js",
