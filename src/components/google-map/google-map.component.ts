@@ -32,6 +32,8 @@ export default class GoogleMap extends ScopedElementsMixin(LitElement) {
   @property({ type: Boolean, attribute: 'single-info-window' }) singleInfoWindow = false;
   @property({ type: Boolean, reflect: true }) draggable = true;
 
+  private static _loadingPromise: Promise<void> | null = null;
+
   @state() private _markers: GoogleMapMarker[] = [];
   @state() private _objects: Element[] = [];
   @state() private _apiLoaded = false;
@@ -155,30 +157,34 @@ export default class GoogleMap extends ScopedElementsMixin(LitElement) {
       return;
     }
 
-    const callbackName = `__googleMapsCallback_${Date.now()}`;
-    const script = document.createElement('script');
-    let url = this.mapsUrl || 'https://maps.googleapis.com/maps/api/js';
-    const params: string[] = [];
+    if (!GoogleMap._loadingPromise) {
+      const callbackName = `__googleMapsCallback_${Date.now()}`;
+      const script = document.createElement('script');
+      let url = this.mapsUrl || 'https://maps.googleapis.com/maps/api/js';
+      const params: string[] = [];
 
-    if (this.apiKey) params.push(`key=${this.apiKey}`);
-    if (this.clientId) params.push(`client=${this.clientId}`);
-    if (this.language) params.push(`language=${this.language}`);
-    if (this.version) params.push(`v=${this.version}`);
-    params.push(`callback=${callbackName}`);
+      if (this.apiKey) params.push(`key=${this.apiKey}`);
+      if (this.clientId) params.push(`client=${this.clientId}`);
+      if (this.language) params.push(`language=${this.language}`);
+      if (this.version) params.push(`v=${this.version}`);
+      params.push(`callback=${callbackName}`);
 
-    url += '?' + params.join('&');
+      url += '?' + params.join('&');
 
-    await new Promise<void>((resolve) => {
-      (window as unknown as Record<string, () => void>)[callbackName] = () => {
-        this._apiLoaded = true;
-        delete (window as unknown as Record<string, () => void>)[callbackName];
-        resolve();
-      };
-      script.src = url;
-      script.async = true;
-      document.head.appendChild(script);
-    });
+      GoogleMap._loadingPromise = new Promise<void>((resolve) => {
+        (window as unknown as Record<string, () => void>)[callbackName] = () => {
+          delete (window as unknown as Record<string, () => void>)[callbackName];
+          resolve();
+        };
+        script.src = url;
+        script.async = true;
+        document.head.appendChild(script);
+      });
+    }
 
+    await GoogleMap._loadingPromise;
+
+    this._apiLoaded = true;
     this._initGMap();
   }
 
