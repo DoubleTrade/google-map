@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/doubletrade/google-map/compare/v2.0.0...v2.0.1) (2026-03-19)
+
+
+### Bug Fixes
+
+* **google-map:** prevent multiple API script injections with singleton loading promise ([15832fc](https://github.com/doubletrade/google-map/commit/15832fc81836efc718f9c275c97f102dbad38dc1))
+
 # [2.0.0](https://github.com/doubletrade/google-map/compare/v1.0.0...v2.0.0) (2025-12-11)
 
 
