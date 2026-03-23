@@ -32,8 +32,6 @@ export default class GoogleMap extends ScopedElementsMixin(LitElement) {
   @property({ type: Boolean, attribute: 'single-info-window' }) singleInfoWindow = false;
   @property({ type: Boolean, reflect: true }) draggable = true;
 
-  private static _loadingPromise: Promise<void> | null = null;
-
   @state() private _markers: GoogleMapMarker[] = [];
   @state() private _objects: Element[] = [];
   @state() private _apiLoaded = false;
@@ -157,7 +155,9 @@ export default class GoogleMap extends ScopedElementsMixin(LitElement) {
       return;
     }
 
-    if (!GoogleMap._loadingPromise) {
+    const win = window as unknown as Record<string, unknown>;
+
+    if (!win.__googleMapsLoadingPromise) {
       const callbackName = `__googleMapsCallback_${Date.now()}`;
       const script = document.createElement('script');
       let url = this.mapsUrl || 'https://maps.googleapis.com/maps/api/js';
@@ -167,13 +167,14 @@ export default class GoogleMap extends ScopedElementsMixin(LitElement) {
       if (this.clientId) params.push(`client=${this.clientId}`);
       if (this.language) params.push(`language=${this.language}`);
       if (this.version) params.push(`v=${this.version}`);
+      params.push(`loading=async`);
       params.push(`callback=${callbackName}`);
 
       url += '?' + params.join('&');
 
-      GoogleMap._loadingPromise = new Promise<void>((resolve) => {
-        (window as unknown as Record<string, () => void>)[callbackName] = () => {
-          delete (window as unknown as Record<string, () => void>)[callbackName];
+      win.__googleMapsLoadingPromise = new Promise<void>((resolve) => {
+        (win as Record<string, () => void>)[callbackName] = () => {
+          delete (win as Record<string, () => void>)[callbackName];
           resolve();
         };
         script.src = url;
@@ -182,7 +183,7 @@ export default class GoogleMap extends ScopedElementsMixin(LitElement) {
       });
     }
 
-    await GoogleMap._loadingPromise;
+    await (win.__googleMapsLoadingPromise as Promise<void>);
 
     this._apiLoaded = true;
     this._initGMap();
