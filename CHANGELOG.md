@@ -1,3 +1,10 @@
+## [2.0.2](https://github.com/doubletrade/google-map/compare/v2.0.1...v2.0.2) (2026-03-23)
+
+
+### Bug Fixes
+
+* **google-map:** prevent duplicate Google Maps API loading ([fb296c9](https://github.com/doubletrade/google-map/commit/fb296c934d7a5777651e3e3b66fc007aa5ae9f08))
+
 ## [2.0.1](https://github.com/doubletrade/google-map/compare/v2.0.0...v2.0.1) (2026-03-19)
 
 
